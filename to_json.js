@@ -52,28 +52,3 @@ function write_json(string, i){
     console.log('written');
   });
 }
-
-// not yet
-function upload(){
-  var MongoClient = require('mongodb').MongoClient;
-  var url = "mongodb+srv://root:Senior-project321@cluster0.u1zph.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-  MongoClient.connect(url, function(err, db) {
-    if (err) throw err;
-    var dbo = db.db('saction-tally1');
-
-    dbo.collection('collection1').find({}).toArray(function(err, res){
-      if (err) throw err;
-      console.log(res);
-      db.close();
-    });
-    /*
-    var myq = {};
-    var newvalues = json;
-    dbo.collection('test1').updateOne(myq, newvalues, function(err, res) {
-      if (err) throw err;
-      console.log('test1 updated');
-      db.close();
-    });
-    */
-  });
-}
