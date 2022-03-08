@@ -1,10 +1,18 @@
 const fs = require("fs");
 //change this filename to get other semesters
-var term = "202220";
-let rawdata = fs.readFileSync(term + ".json");
-let data = JSON.parse(rawdata);
-let temp = Object.values(
-  data.reduce(
+var term = ["202220", "202230", "202240"];
+let temp = null;
+
+for (t in term){
+	let rawdata = fs.readFileSync("json\\" + term[t] + ".json");
+	let data = JSON.parse(rawdata);
+	convert(data);
+	toFile("json\\" + term[t] + "f.json");	
+}
+
+function convert(json_data){
+	temp = Object.values(
+  json_data.reduce(
     (
       a,
       {
@@ -39,7 +47,9 @@ let temp = Object.values(
     },
     {}
   )
-);
+);	
+}
+
 function parseMeeting(meetingString) {
   let splitString = meetingString.split("\n");
   let a = [];
@@ -59,13 +69,13 @@ function parseMeeting(meetingString) {
   return a;
 }
 
-fs.writeFile(
-  term + "f.json",
-  JSON.stringify(temp, null, 2),
-  function (err) {
+function toFile(fname){
+	fs.writeFile(fname,JSON.stringify(temp, null, 2),function (err) {
     if (err) {
       return console.log(err);
     }
     console.log("The file was saved!");
   }
 );
+	
+}

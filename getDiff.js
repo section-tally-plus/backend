@@ -7,33 +7,26 @@ let data2 = JSON.parse(fs.readFileSync(f2 + ".json"));
 var diff = require('deep-diff').diff;
 
 const titles = [];
+const secData = [];
 
 //console.log(diffTitle(data1, data2));
-console.log(gd2(data1, data2));
+getDiff(data1, data2);
+console.log(titles + '\n' + secData);
 
-function diffTitle(d1, d2){
-  // loop through each title
-  for (const x in data2){
-    var differences = diff(data1[x].sectionData, data2[x].sectionData);
-    // change detected
-    if (differences !== undefined){
-      // maybe put for loop here
-      titles.push(data1[x].Title);
-      console.log(data1[x].sectionData[differences[0].path[0]].CRN);
-    }
-  }
-  return titles;
-}
-
-// if crn is needed
-function gd2(d1, d2){
-  for(x in data2){
-    for(y in data2[x].sectionData){
-      var d = diff(data1[x].sectionData[y], data2[x].sectionData[y]);
-      if (d !== undefined){
-        console.log(data2[x].sectionData[y].CRN);
-        console.log(d);
-      }
+function getDiff(d1, d2){
+	// loop through each class
+	console.log(d1[32].sectionData.length);
+	
+  	for(x in d2){
+	// loop through each section of x class
+    	for(y in d2[x].sectionData){
+		// check for diff in x class section
+      	var d = diff(d1[x].sectionData[y], d2[x].sectionData[y]);
+	      if (d !== undefined){
+			titles.push(d1[x].Title);
+			secData.push(d2[x].sectionData[y].CRN);
+        	//console.log(d);
+      	}
     }
   }
 }
