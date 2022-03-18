@@ -1,10 +1,11 @@
 const {MongoClient} = require('mongodb');
 var ObjectID = require('mongodb').ObjectID;
-let addToWatching = ["class4", "class5", "class18"]
-var email = "testFind&Update@students.rowan.edu"
+//let addToWatching = ["09510CJ", "L6101CHEM"];
+let addToWatching = ["L6101CHEM"];
+var email = "chuck@rowan.students.edu"
 
 async function main(){
-    const uri = "";//insert mongodb connection string
+    const uri = "mongodb+srv://root:Senior-project321@cluster0.u1zph.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";//insert mongodb connection string
    
     const client = new MongoClient(uri);
 
@@ -71,7 +72,42 @@ async function main(){
 
         }
 
+        console.log(addToWatching);
+        i = addToWatching.length - 1;
+        //console.log(i);
+        while(i >= 0)
+        {
+            var key = addToWatching[i]; 
+            console.log(key);
 
+
+            if((/[a-zA-Z]/).test(key.charAt(0)))  //Splis up key into subj and crse
+            {
+                var front = key.charAt(0);
+                key = key.replace(key.charAt(0), '');
+
+                word = key.replace(/[0-9]/g, '');
+                num = key.replace(/\D/g,'');
+                num = num.toString();
+                num = front + num;
+            }
+            else
+            {
+                word = key.replace(/[0-9]/g, '');
+                num = key.replace(/\D/g,'');
+                num = num.toString();
+            }
+
+            querey = {"Subj": word, "Crse": num}
+            clss = await client.db("section_tally_plus").collection("stp_202220").findOne(querey); //Find class that will be favorited
+            if(clss.sectionData[i])
+            {
+                newClss = clss.sectionData[i].Favorites + 1  // add 1 to favorites
+                var newValue = { $set: {"sectionData.0.Favorites": newClss } };
+                await client.db("section_tally_plus").collection("stp_202220").updateMany(querey, newValue);   //Update favorites in all classes with that subject and course number
+            }
+                        i --;
+        }
 
 
 
@@ -93,17 +129,17 @@ main().catch(console.error);
 
 async function addUser(client, newUser){  //find document with specified email
 
-    const result = await client.db("saction-tally1").collection("user").findOne(newUser);
+    const result = await client.db("section_tally_plus").collection("user").findOne(newUser);
     newWatch = result.watching;
     return newWatch;  //return the current watching array of classes
     
 }
 
 async function addWatch(client, email, newWatch){  //update document with new watching array
-    const result = await client.db("saction-tally1").collection("user").findOne(email);
+    const result = await client.db("section_tally_plus").collection("user").findOne(email);
     var q = { "_id": ObjectID(result._id)}
     var newValue = { $set: {"watching": newWatch } };
     console.log("This is newWatch" + newWatch);
     console.log(email);
-    await client.db("saction-tally1").collection("user").updateOne(q, newValue);
+    await client.db("section_tally_plus").collection("user").updateOne(q, newValue);
 }

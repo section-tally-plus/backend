@@ -1,10 +1,11 @@
 const {MongoClient} = require('mongodb');
 var ObjectID = require('mongodb').ObjectID;
-let removeWatching = ["class5"] //Class you want to remove
-var email = "testFind&Update@students.rowan.edu"
+let removeWatching = ["L6101CHEM"] //Class you want to remove
+//let removeWatching = ["20334ACC"]
+var email = "chuck@rowan.students.edu"
 
 async function main(){
-    const uri = "";//insert mongodb connection string
+    const uri = "mongodb+srv://root:Senior-project321@cluster0.u1zph.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";//insert mongodb connection string
    
     const client = new MongoClient(uri);
 
@@ -61,6 +62,43 @@ async function main(){
         
         }
 
+        i = removeWatching.length - 1;
+        while(i >= 0)
+        {
+            //res = await client.db("section_tally_plus").collection("user").findOne({email: email}); //User Document
+            var key = removeWatching[i]; 
+            console.log(key);
+
+
+            if((/[a-zA-Z]/).test(key.charAt(0)))  //Splis up key into subj and crse
+            {
+                var front = key.charAt(0);
+                key = key.replace(key.charAt(0), '');
+
+                word = key.replace(/[0-9]/g, '');
+                num = key.replace(/\D/g,'');
+                num = num.toString();
+                num = front + num;
+            }
+            else
+            {
+                word = key.replace(/[0-9]/g, '');
+                num = key.replace(/\D/g,'');
+                num = num.toString();
+            }
+
+            querey = {"Subj": word, "Crse": num}
+            clss = await client.db("section_tally_plus").collection("stp_202220").findOne(querey); //find class to remove from watching
+            if(clss.sectionData[i])
+            {
+                newClss = clss.sectionData[i].Favorites - 1 //remove favorite
+                var newValue = { $set: {"sectionData.0.Favorites": newClss } };
+
+                await client.db("section_tally_plus").collection("stp_202220").updateMany(querey, newValue); //Update favorites in all classes with that subject and course number
+            }
+            i --;
+        }
+
 
 
 
@@ -83,16 +121,16 @@ main().catch(console.error);
 
 async function findUser(client, newUser){  //find document with specified email
 
-    const result = await client.db("saction-tally1").collection("user").findOne(newUser);
+    const result = await client.db("section_tally_plus").collection("user").findOne(newUser);
     oldWatch = result.watching;
     return oldWatch;  //return the current watching array of classes
     
 }
 
 async function removeWatch(client, email, oldWatch){  //update document with new watching array
-    const result = await client.db("saction-tally1").collection("user").findOne(email);
+    const result = await client.db("section_tally_plus").collection("user").findOne(email);
     var q = { "_id": ObjectID(result._id)}
     var newValue = { $set: {"watching": oldWatch } };
     console.log(email);
-    await client.db("saction-tally1").collection("user").updateOne(q, newValue);
+    await client.db("section_tally_plus").collection("user").updateOne(q, newValue);
 }
