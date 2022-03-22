@@ -38,7 +38,7 @@ async function main(){
                         }
                         else
                         {
-                            oldWatch[i] = "Can't be Red"
+                            oldWatch[i] = ""
                             k = i
         
                             while(k < oldWatch.length - 1)
@@ -88,13 +88,42 @@ async function main(){
             }
 
             querey = {"Subj": word, "Crse": num}
-            clss = await client.db("section_tally_plus").collection("stp_202220").findOne(querey); //find class to remove from watching
+            clss = await client.db("section_tally_plus").collection("stp_202220").findOne(querey); //Find class that will be favorited
+            clssArray = await client.db("section_tally_plus").collection("stp_202220").find(querey).toArray();
+            console.log(clssArray.length);
+
+            console.log(clssArray[0].sectionData[0].Favorites);
+            //console.log(clss);
             if(clss.sectionData[i])
             {
-                newClss = clss.sectionData[i].Favorites - 1 //remove favorite
-                var newValue = { $set: {"sectionData.0.Favorites": newClss } };
+                newClss = clss.sectionData[i].Favorites - 1  // subtract 1 to favorites
+               var newValue = 0;
+               var q2 = 0;
+               c = 0;
+                while(c <= clssArray.length - 1)  //Goes through all classes with same Subj and Crse
+                {
+                    k = 0
 
-                await client.db("section_tally_plus").collection("stp_202220").updateMany(querey, newValue); //Update favorites in all classes with that subject and course number
+                    while(k <= clssArray[c].sectionData.length - 1)  //If class has multiple sectionData Objects
+                    {
+                        //console.log(clssArray[c].sectionData[k].Favorites);
+
+                        j = 0;
+                        while(j <= clssArray[c].sectionData.length - 1)
+                        {
+                            q2 = {"_id": clssArray[c]._id}
+                            setter = { "$set": {} };
+                            setter["$set"]["sectionData."+k+".Favorites"] = newClss; //set Favorites value = Favorites - 1
+
+                            await client.db("section_tally_plus").collection("stp_202220").updateOne(q2, setter); //update Favorites field
+                            j ++;
+                        }
+                            k ++;
+                    }
+
+                    c ++;
+                }
+
             }
             i --;
         }
