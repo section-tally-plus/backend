@@ -1,7 +1,7 @@
 const {MongoClient} = require('mongodb');
 var ObjectID = require('mongodb').ObjectID;
-let addToPast = ["class17", "class28"]
-var email = "testFind&Update@students.rowan.edu"
+let addToPast = ["L6101CHEM"]
+var email = "chuck@rowan.students.edu"
 
 async function main(){
     const uri = "";//insert mongodb connection string
@@ -93,15 +93,16 @@ main().catch(console.error);
 
 async function addUser(client, newUser){  //find document with specified email
 
-    const result = await client.db("saction-tally1").collection("user").findOne(newUser);
+    const result = await client.db("section_tally_plus").collection("user").findOne(newUser);
     newPast = result.past_classes;
+    //console.log(result);
     return newPast;  //return the current past_classes array of classes
     
 }
 
 async function addPast(client, email, newPast){  //update document with new past_classes array
-    const result = await client.db("saction-tally1").collection("user").findOne(email);
+    const result = await client.db("section_tally_plus").collection("user").findOne(email);
     var q = { "_id": ObjectID(result._id)}
     var newValue = { $set: {"past_classes": newPast } };
-    await client.db("saction-tally1").collection("user").updateOne(q, newValue);
+    await client.db("section_tally_plus").collection("user").updateOne(q, newValue);
 }

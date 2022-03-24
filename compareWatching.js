@@ -1,6 +1,6 @@
 const {MongoClient} = require('mongodb');
 
-var email = "notifyTest@rowan.students.edu";
+var email = "chuck@rowan.students.edu";
 
 async function main(){
     
@@ -29,13 +29,14 @@ main().catch(console.error);
 
 async function addUser(client, email){
 
-    result = await client.db("saction-tally1").collection("user").findOne(email); //User Document
+    result = await client.db("section_tally_plus").collection("user").findOne(email); //User Document
 
     var c = result.watching.length - 1;
+    //console.log(result.watching.length);
     any = 0;
     while(c >= 0)    //finds classes in watching list in collection1 by using Crse and Subj
     {
-
+        any = 0;
         var key = result.watching[c];  //key is string "CrseSubj", watching classes saved as key
 
 
@@ -57,11 +58,12 @@ async function addUser(client, email){
             }
 
 
-        clss = await client.db("saction-tally1").collection("collection1").findOne({"Subj": word, "Crse": num});
+        clss = await client.db("section_tally_plus").collection("stp_202220").findOne({"Subj": word, "Crse": num});
+        console.log(clss.Subj);
         project = { projection: {"Enr": 1, "Max": 1} };
         
         query = { "Crse": num, "Subj": word };
-        clss2 = await client.db("saction-tally1").collection("collection1").find(query, project).toArray();  //find all documents of class and put them in array
+        clss2 = await client.db("section_tally_plus").collection("stp_202220").find(query, project).toArray();  //find all documents of class and put them in array
         var i = clss2.length -1;
         
         if(clss2.length > 0)
@@ -76,10 +78,11 @@ async function addUser(client, email){
                     i --;
             }
         }
+        //console.log(clss);
         console.log(result.email + " there is " + any + " section(s) of " + clss.Title + " open!"); //Somehow notify the user via email or text
 
         c --;
     }
-    return result;
+    //return result;
     
 }
