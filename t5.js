@@ -22,11 +22,12 @@ function start() {
     req[i].open("GET", url, true);
     req[i].send();
 
-    req[i].onload = function (e) {
+    req[i].onload = function(e) {
       console.log(current_terms[i] + " response");
       write_json(to_json_str(req[i].response), i);
     };
   }
+  
 }
 
 function to_json_str(a) {
@@ -57,7 +58,17 @@ function convert(json_data){
         Prof,
         Sect,
         Campus,
-        Hrs,
+		Hrs,
+        Max,
+        MaxResv,
+        LeftResv,
+        Enr,
+        Avail,
+        WaitCap,
+        WaitCount,
+        WaitAvail,
+        Room,
+        Cap,
         "Part of Term": PartOfTerm,
         "Day  Beg   End   Bldg Room  (Type)": meetingInfo,
       }
@@ -74,6 +85,17 @@ function convert(json_data){
         Sect,
         Campus,
         Prof,
+        Avail,
+        Max,
+        MaxResv,
+        LeftResv,
+        Enr,
+        Avail,
+        WaitCap,
+        WaitCount,
+        WaitAvail,
+        Room,
+        Cap,
         Favorites: 0,
         meetingData: parsedData,
       });
