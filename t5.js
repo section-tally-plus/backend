@@ -5,6 +5,10 @@ var current_terms = ["202220", "202230", "202240"];
 var req = new Array();
 const { MONGODB_URI } = process.env;
 
+var MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://root:Senior-project321@cluster0.u1zph.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const client = new MongoClient(uri);
+
 start();
 
 function start() {
@@ -24,7 +28,11 @@ function start() {
 
     req[i].onload = function(e) {
       console.log(current_terms[i] + " response");
-      write_json(to_json_str(req[i].response), i);
+      //write_json(to_json_str(req[i].response), i);
+      //var data = to_json_str(req[i].response)
+      var res = to_json_str(req[i].response);
+      upload(res, current_terms[i]);
+      //console.log(data)
     };
   }
   
@@ -58,7 +66,7 @@ function convert(json_data){
         Prof,
         Sect,
         Campus,
-		Hrs,
+		    Hrs,
         Max,
         MaxResv,
         LeftResv,
@@ -104,7 +112,8 @@ function convert(json_data){
     {}
   )
 );
-	return JSON.stringify(temp, null, 2);
+	//return JSON.stringify(temp, null, 2);
+  return temp
 }
 
 function parseMeeting(meetingString) {
@@ -125,6 +134,37 @@ function parseMeeting(meetingString) {
   });
   return a;
 }
+
+function upload(str, term){
+  console.log('upload');
+  MongoClient.connect(uri, function(err, db){
+  if (err) throw err;
+  var dbo = db.db("sandbox");
+  dbo.collection(term.toString()).insertMany(str, function(err, res){
+    if (err) throw err;
+    console.log('inserted');
+    db.close();
+  });
+  });
+}
+
+
+/*
+function run(str) {
+  try {
+    client.connect();
+    const database = client.db("sandbox");
+    const coll = database.collection("mycollection");
+    // create a document to insert
+    const doc = str
+    const result = coll.insertOne(doc);
+    console.log(`A document was inserted`);
+  } finally {
+    client.close();
+  }
+}
+run().catch(console.dir);
+*/
 
 function write_json(string, i) {
   fs.writeFile("json\\" + current_terms[i] + ".json", string, function (err) {

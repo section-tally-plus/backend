@@ -1,42 +1,45 @@
-upload();
+var MongoClient = require('mongodb').MongoClient;
+// Replace the uri string with your MongoDB deployment's connection string.
+const uri = "mongodb+srv://root:Senior-project321@cluster0.u1zph.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const client = new MongoClient(uri);
 
-function upload() {
-  var MongoClient = require("mongodb").MongoClient;
-  const { MONGODB_URI } = process.env;
-  var url = MONGODB_URI;
-  MongoClient.connect(url, function (err, db) {
+/*
+async function run(str) {
+  try {
+    await client.connect();
+    const database = client.db("sandbox");
+    const coll = database.collection("mycollection");
+    // create a document to insert
+    const doc = str
+    const result = await coll.insertOne(doc);
+    console.log(`A document was inserted with the _id: ${result.insertedId}`);
+  } finally {
+    await client.close();
+  }
+}
+run().catch(console.dir);
+*/
+const fs = require("fs");
+var f1 = "json\\" + "202220";
+var f2 = "json\\" + "202220old";
+let data1 = JSON.parse(fs.readFileSync(f1 + ".json"));
+let data2 = JSON.parse(fs.readFileSync(f2 + ".json"));
+
+
+upload(data1);
+
+function upload(str){
+  var mystr = JSON.stringify(str, null, 2);
+  MongoClient.connect(uri, function(err, db){
+  if (err) throw err;
+  var dbo = db.db("sandbox");
+  for(x in str){
+    //console.log(x)
+  }
+  dbo.collection("mycollection").insertMany(str, function(err, res){
     if (err) throw err;
-    var dbo = db.db("saction-tally1");
-
-    dbo
-      .collection("test2")
-      .insertOne({
-        CRN: "12345",
-        Subj: "JM",
-        Crse: "123456",
-        Sect: "  1",
-        "Part of Term": "Full Term ... \n06-SEP to 21-DEC",
-        Session: "Day",
-        Title: "Test Title.\n",
-        Prof: "James, Merc",
-        "Day  Beg   End   Bldg Room  (Type)":
-          "MW      1230 1345 BUSN 121 (Class)",
-        Campus: "Main",
-        AddlInfo: "",
-        Hrs: 3,
-        Max: 20,
-        MaxResv: 0,
-        LeftResv: 0,
-        Enr: 0,
-        Avail: 20,
-        WaitCap: 0,
-        WaitCount: 0,
-        WaitAvail: 0,
-        "Room Cap": "40",
-      })
-      .then(function (result) {
-        console.log(result);
-        db.close();
-      });
+    console.log('inserted');
+    db.close();
+  });
   });
 }
