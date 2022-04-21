@@ -1,6 +1,6 @@
 const fs = require("fs");
 //change this filename to get other semesters
-let rawdata = fs.readFileSync("202240.json");
+let rawdata = fs.readFileSync("202220.json");
 let data = JSON.parse(rawdata);
 let temp = Object.values(
   data.reduce(
@@ -22,7 +22,15 @@ let temp = Object.values(
       let num = Title;
       const idkey = num.replace(/ /g, "_");
       if (!a[num]) {
-        a[num] = { _id: idkey, Title, Subj, Crse, Hrs, sectionData: [] };
+        a[num] = {
+          _id: idkey,
+          Title,
+          Subj,
+          Favorites: 0,
+          Crse,
+          Hrs,
+          sectionData: [],
+        };
       }
       parsedData = parseMeeting(meetingInfo);
       a[num].sectionData.push({
@@ -31,7 +39,6 @@ let temp = Object.values(
         Sect,
         Campus,
         Prof,
-        Favorites: 0,
         meetingData: parsedData,
       });
       return a;
